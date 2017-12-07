@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@polymer/iron-pages": "^0.0.3",
+    "@polymer/paper-card": "^0.0.3",
+    "@polymer/paper-tabs": "^0.0.3"
+  }
+}

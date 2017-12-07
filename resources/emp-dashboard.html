@@ -1,0 +1,98 @@
+<link rel="import" href="node_modules/@polymer/polymer/polymer.html">
+<link rel="import" href="node_modules/@polymer/paper-tabs/paper-tabs.html">
+<link rel="import" href="node_modules/@polymer/iron-pages/iron-pages.html">
+
+
+<dom-module id="emp-dashboard">
+    <template>
+        <style>
+            :host {
+                --paper-tabs-selection-bar-color: #bc204b;
+                font-family: Apex,Helvetica,Arial,sans-serif;
+            }
+
+            paper-tab {
+                color: #707070;
+            }
+
+            paper-tab.iron-selected {
+                color: #bc204b;
+            }
+
+            #container {
+                display: flex;
+                flex-direction: row;
+            }
+
+            #statisticsbox {
+                flex: 1;
+                box-shadow: -10px 0 10px -10px rgba(0,0,0,.25);
+                margin-right: 10px;
+            }
+
+            #mapbox {
+                flex: 2;
+            }
+
+            #map {
+                width: 100%;
+                height: 100%;
+                margin-top: 10px;
+            }
+            
+            #header {
+                padding: 10px 0 10px 112px;
+                box-shadow: 0 2px 10px rgba(0,0,0,.25);
+            }
+        </style>
+
+        <div id="header">
+            <img src="img/empatica_logo_red.svg"/>
+        </div>
+        
+        <div id="container">
+            
+            <div id="statisticsbox">
+                <paper-tabs selected="{{tabindex}}" noink>
+                    <paper-tab>by country</paper-tab>
+                    <paper-tab>by time</paper-tab>
+                </paper-tabs>
+
+                <iron-pages selected="{{tabindex}}">
+                    <div>One</div>
+                    <div>Two</div>
+                </iron-pages>
+            </div>
+            
+            <div id="mapbox">
+                <div id="map"></div>
+            </div>
+            
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'emp-dashboard',
+
+            properties: {
+                tabindex: {
+                    type: Number,
+                    value: 0
+                },
+            }
+        });
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 16,
+                center: new google.maps.LatLng(-33.91722, 151.23064),
+                mapTypeId: 'roadmap'
+            });
+        }
+    </script>
+
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDZCBbh7caTF-CSc9Xu1fM7InZx5Q-nqk4&callback=initMap">
+    </script>
+</dom-module>
