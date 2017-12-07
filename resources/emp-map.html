@@ -1,0 +1,78 @@
+<link rel="import" href="node_modules/@polymer/polymer/polymer.html">
+
+<dom-module id="emp-map">
+    <template>
+        <style>
+            :host {
+                width: 100%;
+                height: 100%;
+                position: absolute;
+            }
+
+            #map {
+                width: 100%;
+                height: 100%;
+                margin-top: 10px;
+            }
+        </style>
+
+        <div id="map"></div>
+    </template>
+
+    <script>
+        var _isMapInitialized = false;
+        var map;
+
+        Polymer({
+            is: 'emp-map',
+
+            properties: {
+                pendingMarkers: {
+                    type: Array,
+                    value: []
+                },
+                isMapInitialized: {
+                    type: Boolean,
+                    value: false,
+                    notify: true
+                }
+            },
+
+            attached: function(){
+                // set polymer property once
+                var checkIsMapInitialized = () => {
+                    if (_isMapInitialized)
+                    {
+                        this.set("isMapInitialized", true);
+                    } else {
+                        setTimeout(() => { 
+                            checkIsMapInitialized();
+                        }, 100);
+                    }
+                };
+                checkIsMapInitialized();
+            },
+
+            addMarker: function(long, lat){
+                var uluru = {lat: lat, lng: long};
+                var marker = new google.maps.Marker({
+                    position: uluru,
+                    map: map
+                });
+            }
+        });
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 5,
+                center: new google.maps.LatLng(45.464204, 9.189982),
+                mapTypeId: 'roadmap'
+            });
+            _isMapInitialized = true;
+        }
+    </script>
+
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDZCBbh7caTF-CSc9Xu1fM7InZx5Q-nqk4&callback=initMap">
+    </script>
+</dom-module>
