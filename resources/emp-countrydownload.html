@@ -1,0 +1,90 @@
+<link rel="import" href="node_modules/@polymer/polymer/polymer.html">
+
+<dom-module id="emp-countrydownload">
+    <template>
+        <style>
+            :host {
+            }
+
+            .wrap {
+                display: flex;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .wrap div {
+                border: 1px solid black;
+                padding: 10px;
+            }
+            
+            .country {
+                flex: 3;
+            }
+            
+            .downloads {
+                flex: 1;
+                text-align: center;
+            }
+        </style>
+
+        <div class="wrap">
+            <div class="country">Country</div>
+            <div class="downloads">Downloads</div>
+        </div>
+        <template is="dom-repeat" items="{{downloads}}">
+            <div class="wrap">
+                <div class="country">{{item.country}}</div>
+                <div class="downloads">{{item.amount}}</div>
+            </div>
+        </template>
+    </template>
+
+    <script>
+
+        Polymer({
+            is: 'emp-countrydownload',
+
+            properties: {
+                downloads: {
+                    type: Array,
+                    value: function(){return [];}
+                },
+
+                downloadsByCountry: {
+                    type: Object,
+                    value: function(){return new Map();}
+                },
+
+                isInitialized: {
+                    type: Boolean,
+                    value: false,
+                    notify: true
+                }
+            },
+
+            attached: function(){
+                this.set("isInitialized", true);
+            },
+
+            addDownload: function(country){
+                if (this.downloadsByCountry.has(country))
+                {
+                    let newAmount = this.downloadsByCountry.get(country) + 1;
+                    this.downloadsByCountry.set(country, newAmount);
+                    var index = -1;
+                    for (let i = 0; i < this.downloads.length; i++)
+                    {
+                        if (this.downloads[i].country === country){
+                            index = i;
+                            break;
+                        }
+                    }
+                    this.set(["downloads", index], {country: country, amount: newAmount});
+                } else {
+                    this.downloadsByCountry.set(country, 1);
+                    this.push("downloads", {country: country, amount: 1});
+                }
+            }
+        });
+    </script>
+</dom-module>

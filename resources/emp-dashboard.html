@@ -2,6 +2,7 @@
 <link rel="import" href="node_modules/@polymer/paper-tabs/paper-tabs.html">
 <link rel="import" href="node_modules/@polymer/iron-pages/iron-pages.html">
 <link rel="import" href="emp-map.html">
+<link rel="import" href="emp-countrydownload.html">
 
 
 <dom-module id="emp-dashboard">
@@ -42,6 +43,10 @@
                 padding: 10px 0 10px 112px;
                 box-shadow: 0 2px 10px rgba(0,0,0,.25);
             }
+            
+            iron-pages {
+                padding: 10px;
+            }
         </style>
 
         <div id="header">
@@ -57,7 +62,7 @@
                 </paper-tabs>
 
                 <iron-pages selected="{{tabindex}}">
-                    <div>One</div>
+                    <emp-countrydownload id="countrydownload" is-initialized="{{isCountryDownloadInitialized}}"></emp-countrydownload>
                     <div>Two</div>
                 </iron-pages>
             </div>
@@ -78,17 +83,23 @@
                     type: Number,
                     value: 0
                 },
-                
+
                 downloadData: {
                     type: Array,
                     value: []
                 },
-                
+
                 isMapInitialized: {
                     type: Boolean,
                     value: false,
                     observer: "_isMapInitializedChanged"
-                }
+                },
+                
+                isCountryDownloadInitialized: {
+                    type: Boolean,
+                    value: false,
+                    observer: "_isCountryDownloadInitializedChanged"
+                },
             },
 
             attached: function(){
@@ -98,18 +109,28 @@
                 xmlhttp.onreadystatechange = function() {
                     if (this.readyState == 4 && this.status == 200) {
                         that.downloadData = JSON.parse(this.responseText);
+                        that._checkFillData();
                     }
                 };
                 xmlhttp.open("GET", "/service/getdownloads", true);
                 xmlhttp.send();
             },
             
-            _isMapInitializedChanged: function(){
-                if (this.isMapInitialized){
+            _checkFillData: function(){
+                if (this.isMapInitialized && this.isCountryDownloadInitialized){
                     for (var i = 0; i < this.downloadData.length; i++){
-                       this.$$("#map").addMarker(this.downloadData[i]["longitude"], this.downloadData[i]["latitude"]); 
+                        this.$$("#map").addMarker(this.downloadData[i]["longitude"], this.downloadData[i]["latitude"]);
+                        this.$$("#countrydownload").addDownload(this.downloadData[i]["country"]);
                     }
                 }
+            },
+
+            _isMapInitializedChanged: function(){
+                this._checkFillData();
+            },
+            
+            _isCountryDownloadInitializedChanged: function(){
+                this._checkFillData();
             }
         });
     </script>

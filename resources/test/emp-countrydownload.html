@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script src="../node_modules/webcomponents.js/webcomponents-lite.js"></script>
+        <script src="../node_modules/web-component-tester/browser.js"></script>
+        <script src="../node_modules/async/dist/async.js"></script>
+        <script src="../node_modules/@polymer/test-fixture/test-fixture-mocha.js"></script>
+        <link rel="import" href="../emp-countrydownload.html">
+        <link rel="import" href="../node_modules/@polymer/test-fixture/test-fixture.html">
+    </head>
+    <body>
+
+        <test-fixture id="fixture">
+            <template>
+                <emp-countrydownload id="myEl"></emp-countrydownload>
+            </template>
+        </test-fixture>
+
+        <script>
+            suite('<emp-countrydownload>', function() {
+                var myEl;
+                setup(function() {
+                    document.getElementById('fixture').create();
+                    myEl = document.getElementById('myEl');
+                    //myEl = fixture('fixture');
+                });
+                
+                teardown(function(){
+                    document.getElementById('fixture').restore();
+                    myEl.set("downloads", []);
+                    myEl.set("downloadsByCountry", new Map());
+                });
+
+                test('add download', function() {
+                    assert.isTrue(myEl.downloads.length === 0);
+                    myEl.addDownload("A");
+                    assert.isTrue(myEl.downloads.length === 1);
+                    assert.isTrue(myEl.downloads[0].amount === 1);
+                    assert.isTrue(myEl.downloads[0].country === "A");
+                });
+                
+                test('add download same country', function() {
+                    assert.isTrue(myEl.downloads.length === 0);
+                    myEl.addDownload("A");
+                    assert.isTrue(myEl.downloads.length === 1);
+                    assert.isTrue(myEl.downloads[0].amount === 1);
+                    assert.isTrue(myEl.downloads[0].country === "A");
+                    myEl.addDownload("A");
+                    assert.isTrue(myEl.downloads.length === 1);
+                    assert.isTrue(myEl.downloads[0].amount === 2);
+                    assert.isTrue(myEl.downloads[0].country === "A");
+                });
+                
+                test('add download different countries', function() {
+                    assert.isTrue(myEl.downloads.length === 0);
+                    myEl.addDownload("A");
+                    assert.isTrue(myEl.downloads.length === 1);
+                    assert.isTrue(myEl.downloads[0].amount === 1);
+                    assert.isTrue(myEl.downloads[0].country === "A");
+                    myEl.addDownload("B");
+                    assert.isTrue(myEl.downloads.length === 2);
+                    assert.isTrue(myEl.downloads[0].amount === 1);
+                    assert.isTrue(myEl.downloads[0].country === "A");
+                    assert.isTrue(myEl.downloads[1].amount === 1);
+                    assert.isTrue(myEl.downloads[1].country === "B");
+                    myEl.addDownload("A");
+                    assert.isTrue(myEl.downloads.length === 2);
+                    assert.isTrue(myEl.downloads[0].amount === 2);
+                    assert.isTrue(myEl.downloads[0].country === "A");
+                    assert.isTrue(myEl.downloads[1].amount === 1);
+                    assert.isTrue(myEl.downloads[1].country === "B");
+                });
+            });
+        </script>
+    </body>
+</html>
