@@ -36,7 +36,7 @@ def generateTestdata():
     d = datetime.today() - timedelta(seconds=randint(0, 60*60*24*3*356)) # three years back until now
     ret["downloaded_at"] = d.isoformat(' ')
     ret["longitude"] = -180.0 + randint(0, 360000)/1000.0
-    ret["latitude"] = -90.0 + randint(0, 180000)/1000.0
+    ret["latitude"] = -85.0 + randint(0, 170000)/1000.0
     return ret
      
 
