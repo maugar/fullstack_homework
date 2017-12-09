@@ -54,9 +54,8 @@
             },
 
             addMarker: function(long, lat){
-                var uluru = {lat: lat, lng: long};
                 var marker = new google.maps.Marker({
-                    position: uluru,
+                    position: {lat: lat, lng: long},
                     map: map
                 });
             }

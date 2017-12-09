@@ -21,16 +21,7 @@
             suite('<emp-timedownload>', function() {
                 var myEl;
                 setup(function() {
-                    document.getElementById('fixture').create();
-                    myEl = document.getElementById('myEl');
-                    //myEl = fixture('fixture');
-                });
-
-                teardown(function(){
-                    document.getElementById('fixture').restore();
-                    for (let i = 0; i < myEl.timesOfDay.length; i++) {
-                        myEl.set(["downloadsByTime", i], {time: myEl.timesOfDay[i], amount: 0});
-                    }
+                    myEl = fixture('fixture');
                 });
 
                 test('add morning download', function() {

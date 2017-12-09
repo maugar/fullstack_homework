@@ -21,17 +21,9 @@
             suite('<emp-countrydownload>', function() {
                 var myEl;
                 setup(function() {
-                    document.getElementById('fixture').create();
-                    myEl = document.getElementById('myEl');
-                    //myEl = fixture('fixture');
+                    myEl = fixture('fixture');
                 });
                 
-                teardown(function(){
-                    document.getElementById('fixture').restore();
-                    myEl.set("downloads", []);
-                    myEl.set("downloadsByCountry", new Map());
-                });
-
                 test('add download', function() {
                     assert.isTrue(myEl.downloads.length === 0);
                     myEl.addDownload("A");
