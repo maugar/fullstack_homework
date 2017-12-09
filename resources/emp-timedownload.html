@@ -1,0 +1,118 @@
+<link rel="import" href="node_modules/@polymer/polymer/polymer.html">
+<script src="node_modules/moment/moment.js"></script>
+
+<dom-module id="emp-timedownload">
+    <template>
+        <style>
+            :host {
+            }
+
+            .wrap {
+                display: flex;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .wrap div {
+                border: 1px solid black;
+                padding: 10px;
+            }
+            
+            .header {
+                background: #BF99A4;
+            }
+
+            .time {
+                flex: 3;
+            }
+
+            .downloads {
+                flex: 2;
+                text-align: center;
+            }
+        </style>
+
+        <div class="wrap header">
+            <div class="time">Time of Day</div>
+            <div class="downloads">Downloads</div>
+        </div>
+        <template is="dom-repeat" items="{{downloadsByTime}}">
+            <div class="wrap">
+                <div class="time">{{item.time}}</div>
+                <div class="downloads">{{item.amount}}</div>
+            </div>
+        </template>
+
+    </template>
+
+    <script>
+
+        Polymer({
+            is: 'emp-timedownload',
+
+            properties: {
+                downloadsByTime: {
+                    type: Array,
+                    value: function(){return [];}
+                },
+
+                // labels for the different time groups
+                timesOfDay: {
+                    type: Array,
+                    value: function(){ return ["morning", "afternoon", "evening", "night"];}
+                },
+
+                // define the hours for the different time groups
+                hoursForTimes: {
+                    type: Object,
+                    value: function(){
+                        return new Map([
+                            ['morning', {start: 6, end: 12}],
+                            ['afternoon', {start: 12, end: 18}],
+                            ['evening', {start: 18, end: 22}],
+                            ['night', {start: 22, end: 6}]
+                        ]);
+                    }
+                },
+
+                isInitialized: {
+                    type: Boolean,
+                    value: false,
+                    notify: true
+                }
+            },
+
+            attached: function(){
+                for (let i = 0; i < this.timesOfDay.length; i++) {
+                    this.push("downloadsByTime", {time: this.timesOfDay[i], amount: 0});
+                }
+                this.set("isInitialized", true);
+            },
+
+            addDownload: function(time){
+                let index = -1;
+                let hourTime = moment(time).hours();
+                for (let i = 0; i < this.timesOfDay.length; i++){
+                    let hours = this.hoursForTimes.get(this.timesOfDay[i]);
+                    if (hours.start > hours.end){
+                        // special case: the timespan goes over midnight
+                        // either we have a time before midnight or early in the new day
+                        if (hourTime >= hours.start || hourTime < hours.end){
+                            index = i;
+                            break;
+                        }
+                    }
+                    else if (hourTime >= hours.start && hourTime < hours.end)
+                    {
+                        index = i;
+                        break;
+                    }
+                }
+                let timeOfDay = this.timesOfDay[index];
+                let newAmount = this.downloadsByTime[index].amount;
+                newAmount++;
+                this.set(["downloadsByTime", index, "amount"], newAmount);
+            }
+        });
+    </script>
+</dom-module>

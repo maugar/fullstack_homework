@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script src="../node_modules/webcomponents.js/webcomponents-lite.js"></script>
+        <script src="../node_modules/web-component-tester/browser.js"></script>
+        <script src="../node_modules/async/dist/async.js"></script>
+        <script src="../node_modules/@polymer/test-fixture/test-fixture-mocha.js"></script>
+        <link rel="import" href="../emp-timedownload.html">
+        <link rel="import" href="../node_modules/@polymer/test-fixture/test-fixture.html">
+    </head>
+    <body>
+
+        <test-fixture id="fixture">
+            <template>
+                <emp-timedownload id="myEl"></emp-timedownload>
+            </template>
+        </test-fixture>
+
+        <script>
+            suite('<emp-timedownload>', function() {
+                var myEl;
+                setup(function() {
+                    document.getElementById('fixture').create();
+                    myEl = document.getElementById('myEl');
+                    //myEl = fixture('fixture');
+                });
+
+                teardown(function(){
+                    document.getElementById('fixture').restore();
+                    for (let i = 0; i < myEl.timesOfDay.length; i++) {
+                        myEl.set(["downloadsByTime", i], {time: myEl.timesOfDay[i], amount: 0});
+                    }
+                });
+
+                test('add morning download', function() {
+                    myEl.addDownload("2017-07-14 06:20:52.477395");
+                    assert.isTrue(myEl.downloadsByTime[0].amount === 1);
+                    assert.isTrue(myEl.downloadsByTime[1].amount === 0);
+                    assert.isTrue(myEl.downloadsByTime[2].amount === 0);
+                    assert.isTrue(myEl.downloadsByTime[3].amount === 0);
+                });
+                
+                test('add afternoon download', function() {
+                    myEl.addDownload("2017-07-14 12:11:52.477395");
+                    assert.isTrue(myEl.downloadsByTime[0].amount === 0);
+                    assert.isTrue(myEl.downloadsByTime[1].amount === 1);
+                    assert.isTrue(myEl.downloadsByTime[2].amount === 0);
+                    assert.isTrue(myEl.downloadsByTime[3].amount === 0);
+                });
+                
+                test('add evening download', function() {
+                    myEl.addDownload("2017-07-14 19:11:52.477395");
+                    assert.isTrue(myEl.downloadsByTime[0].amount === 0);
+                    assert.isTrue(myEl.downloadsByTime[1].amount === 0);
+                    assert.isTrue(myEl.downloadsByTime[2].amount === 1);
+                    assert.isTrue(myEl.downloadsByTime[3].amount === 0);
+                });
+                
+                test('add night before midnight download', function() {
+                    myEl.addDownload("2017-07-14 23:11:52.477395");
+                    assert.isTrue(myEl.downloadsByTime[0].amount === 0);
+                    assert.isTrue(myEl.downloadsByTime[1].amount === 0);
+                    assert.isTrue(myEl.downloadsByTime[2].amount === 0);
+                    assert.isTrue(myEl.downloadsByTime[3].amount === 1);
+                });
+                
+                test('add night after midnight download', function() {
+                    myEl.addDownload("2017-07-14 05:11:52.477395");
+                    assert.isTrue(myEl.downloadsByTime[0].amount === 0);
+                    assert.isTrue(myEl.downloadsByTime[1].amount === 0);
+                    assert.isTrue(myEl.downloadsByTime[2].amount === 0);
+                    assert.isTrue(myEl.downloadsByTime[3].amount === 1);
+                });
+                
+                test('add two downloads same time', function() {
+                    myEl.addDownload("2017-07-14 8:11:52.477395");
+                    assert.isTrue(myEl.downloadsByTime[0].amount === 1);
+                    assert.isTrue(myEl.downloadsByTime[1].amount === 0);
+                    assert.isTrue(myEl.downloadsByTime[2].amount === 0);
+                    assert.isTrue(myEl.downloadsByTime[3].amount === 0);
+                    myEl.addDownload("2017-07-14 11:11:52.477395");
+                    assert.isTrue(myEl.downloadsByTime[0].amount === 2);
+                    assert.isTrue(myEl.downloadsByTime[1].amount === 0);
+                    assert.isTrue(myEl.downloadsByTime[2].amount === 0);
+                    assert.isTrue(myEl.downloadsByTime[3].amount === 0);
+                    myEl.addDownload("2017-07-14 18:11:52.477395");
+                    assert.isTrue(myEl.downloadsByTime[0].amount === 2);
+                    assert.isTrue(myEl.downloadsByTime[1].amount === 0);
+                    assert.isTrue(myEl.downloadsByTime[2].amount === 1);
+                    assert.isTrue(myEl.downloadsByTime[3].amount === 0);
+                });
+            });
+        </script>
+    </body>
+</html>

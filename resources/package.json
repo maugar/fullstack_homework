@@ -4,6 +4,7 @@
     "@polymer/paper-card": "^0.0.3",
     "@polymer/paper-tabs": "^0.0.3",
     "async": "^2.6.0",
+    "moment": "^2.19.3",
     "web-component-tester": "^6.4.1"
   }
 }

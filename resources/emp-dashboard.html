@@ -3,6 +3,7 @@
 <link rel="import" href="node_modules/@polymer/iron-pages/iron-pages.html">
 <link rel="import" href="emp-map.html">
 <link rel="import" href="emp-countrydownload.html">
+<link rel="import" href="emp-timedownload.html">
 
 
 <dom-module id="emp-dashboard">
@@ -63,7 +64,7 @@
 
                 <iron-pages selected="{{tabindex}}">
                     <emp-countrydownload id="countrydownload" is-initialized="{{isCountryDownloadInitialized}}"></emp-countrydownload>
-                    <div>Two</div>
+                    <emp-timedownload id="timedownload" is-initialized="{{isTimeDownloadInitialized}}"></emp-timedownload>
                 </iron-pages>
             </div>
 
@@ -100,6 +101,12 @@
                     value: false,
                     observer: "_isCountryDownloadInitializedChanged"
                 },
+                
+                isTimeDownloadInitialized: {
+                    type: Boolean,
+                    value: false,
+                    observer: "_isTimeDownloadInitializedChanged"
+                },
             },
 
             attached: function(){
@@ -117,10 +124,11 @@
             },
             
             _checkFillData: function(){
-                if (this.isMapInitialized && this.isCountryDownloadInitialized){
+                if (this.isMapInitialized && this.isCountryDownloadInitialized && this.isTimeDownloadInitialized){
                     for (var i = 0; i < this.downloadData.length; i++){
                         this.$$("#map").addMarker(this.downloadData[i]["longitude"], this.downloadData[i]["latitude"]);
                         this.$$("#countrydownload").addDownload(this.downloadData[i]["country"]);
+                        this.$$("#timedownload").addDownload(this.downloadData[i]["downloaded_at"]);
                     }
                 }
             },
@@ -130,6 +138,10 @@
             },
             
             _isCountryDownloadInitializedChanged: function(){
+                this._checkFillData();
+            },
+            
+            _isTimeDownloadInitializedChanged: function(){
                 this._checkFillData();
             }
         });
