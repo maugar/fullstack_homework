@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script src="../node_modules/webcomponents.js/webcomponents-lite.js"></script>
+        <script src="../node_modules/web-component-tester/browser.js"></script>
+        <script src="../node_modules/async/dist/async.js"></script>
+        <script src="../node_modules/@polymer/test-fixture/test-fixture-mocha.js"></script>
+        <link rel="import" href="../emp-appdownload.html">
+        <link rel="import" href="../node_modules/@polymer/test-fixture/test-fixture.html">
+    </head>
+    <body>
+
+        <test-fixture id="fixture">
+            <template>
+                <emp-appdownload id="myEl"></emp-appdownload>
+            </template>
+        </test-fixture>
+
+        <script>
+            suite('<emp-appdownload>', function() {
+                var myEl;
+                setup(function() {
+                    myEl = fixture('fixture');
+                });
+                
+                test('add download', function() {
+                    assert.isTrue(myEl.downloads.length === 0);
+                    myEl.addDownload("A");
+                    assert.isTrue(myEl.downloads.length === 1);
+                    assert.isTrue(myEl.downloads[0].amount === 1);
+                    assert.isTrue(myEl.downloads[0].app === "A");
+                });
+                
+                test('add download same app id', function() {
+                    assert.isTrue(myEl.downloads.length === 0);
+                    myEl.addDownload("A");
+                    assert.isTrue(myEl.downloads.length === 1);
+                    assert.isTrue(myEl.downloads[0].amount === 1);
+                    assert.isTrue(myEl.downloads[0].app === "A");
+                    myEl.addDownload("A");
+                    assert.isTrue(myEl.downloads.length === 1);
+                    assert.isTrue(myEl.downloads[0].amount === 2);
+                    assert.isTrue(myEl.downloads[0].app === "A");
+                });
+                
+                test('add download different app ids', function() {
+                    assert.isTrue(myEl.downloads.length === 0);
+                    myEl.addDownload("A");
+                    assert.isTrue(myEl.downloads.length === 1);
+                    assert.isTrue(myEl.downloads[0].amount === 1);
+                    assert.isTrue(myEl.downloads[0].app === "A");
+                    myEl.addDownload("B");
+                    assert.isTrue(myEl.downloads.length === 2);
+                    assert.isTrue(myEl.downloads[0].amount === 1);
+                    assert.isTrue(myEl.downloads[0].app === "A");
+                    assert.isTrue(myEl.downloads[1].amount === 1);
+                    assert.isTrue(myEl.downloads[1].app === "B");
+                    myEl.addDownload("A");
+                    assert.isTrue(myEl.downloads.length === 2);
+                    assert.isTrue(myEl.downloads[0].amount === 2);
+                    assert.isTrue(myEl.downloads[0].app === "A");
+                    assert.isTrue(myEl.downloads[1].amount === 1);
+                    assert.isTrue(myEl.downloads[1].app === "B");
+                });
+            });
+        </script>
+    </body>
+</html>

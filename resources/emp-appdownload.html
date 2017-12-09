@@ -1,0 +1,94 @@
+<link rel="import" href="node_modules/@polymer/polymer/polymer.html">
+
+<dom-module id="emp-appdownload">
+    <template>
+        <style>
+            :host {
+            }
+
+            .wrap {
+                display: flex;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .wrap div {
+                border: 1px solid black;
+                padding: 10px;
+            }
+            
+            .header {
+                background: #BF99A4;
+            }
+            
+            .app {
+                flex: 3;
+            }
+            
+            .downloads {
+                flex: 2;
+                text-align: center;
+            }
+        </style>
+
+        <div class="wrap header">
+            <div class="app">App</div>
+            <div class="downloads">Downloads</div>
+        </div>
+        <template is="dom-repeat" items="{{downloads}}">
+            <div class="wrap">
+                <div class="app">{{item.app}}</div>
+                <div class="downloads">{{item.amount}}</div>
+            </div>
+        </template>
+    </template>
+
+    <script>
+
+        Polymer({
+            is: 'emp-appdownload',
+
+            properties: {
+                downloads: {
+                    type: Array,
+                    value: function(){return [];}
+                },
+                
+                downloadsByApp: {
+                    type: Object,
+                    value: function(){return new Map();}
+                },
+
+                isInitialized: {
+                    type: Boolean,
+                    value: false,
+                    notify: true
+                }
+            },
+
+            attached: function(){
+                this.set("isInitialized", true);
+            },
+
+            addDownload: function(app){
+                if (this.downloadsByApp.has(app))
+                {
+                    let newAmount = this.downloadsByApp.get(app) + 1;
+                    this.downloadsByApp.set(app, newAmount);
+                    var index = -1;
+                    for (let i = 0; i < this.downloads.length; i++)
+                    {
+                        if (this.downloads[i].app === app){
+                            index = i;
+                            break;
+                        }
+                    }
+                    this.set(["downloads", index], {app: app, amount: newAmount});
+                } else {
+                    this.downloadsByApp.set(app, 1);
+                    this.push("downloads", {app: app, amount: 1});
+                }
+            }
+        });
+    </script>
+</dom-module>
