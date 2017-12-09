@@ -38,7 +38,7 @@
         </div>
         <template is="dom-repeat" items="{{downloadsByTime}}">
             <div class="wrap">
-                <div class="time">{{item.time}}</div>
+                <div class="time">{{_getTimeSpan(item.time)}}</div>
                 <div class="downloads">{{item.amount}}</div>
             </div>
         </template>
@@ -87,6 +87,11 @@
                     this.push("downloadsByTime", {time: this.timesOfDay[i], amount: 0});
                 }
                 this.set("isInitialized", true);
+            },
+
+            _getTimeSpan: function(time){
+                let hours = this.hoursForTimes.get(time);
+                return time + " (" + hours.start + " - " + hours.end + ")";
             },
 
             addDownload: function(time){
