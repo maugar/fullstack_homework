@@ -15,7 +15,11 @@ def getStaticFile(path):
 
 @app.route('/', methods=['GET'])
 def getIndexFile():
-    return send_from_directory('resources', 'index.html')
+    return send_from_directory('resources', 'index.vulcanized.html')
+
+@app.route('/index.html', methods=['GET'])
+def getVulcanizedIndexFile():
+    return send_from_directory('resources', 'index.vulcanized.html')
 
 # receive new app download data
 @app.route('/service/adddownloads', methods=['POST'])
