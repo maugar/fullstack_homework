@@ -17648,12 +17648,15 @@ Example:
         });
 
         function initMap() {
-            map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 5,
-                center: new google.maps.LatLng(45.464204, 9.189982),
-                mapTypeId: 'roadmap'
-            });
-            _isMapInitialized = true;
+            let initialize = function(){
+                map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 5,
+                    center: new google.maps.LatLng(45.464204, 9.189982),
+                    mapTypeId: 'roadmap'
+                });
+                _isMapInitialized = true;
+            }
+            google.maps.event.addDomListener(window, "load", initialize);
         }
     </script>
 
@@ -17959,7 +17962,7 @@ Example:
             }
         });
     </script>
-</dom-module><script src="node_modules/moment/moment.js"></script><dom-module id="emp-trenddownload" assetpath="">
+</dom-module><dom-module id="emp-trenddownload" assetpath="">
     <template>
         <style>
             :host {
@@ -18204,31 +18207,26 @@ Example:
 
                 isMapInitialized: {
                     type: Boolean,
-                    value: false,
                     observer: "_isMapInitializedChanged"
                 },
                 
                 isCountryDownloadInitialized: {
                     type: Boolean,
-                    value: false,
                     observer: "_isCountryDownloadInitializedChanged"
                 },
                 
                 isTimeDownloadInitialized: {
                     type: Boolean,
-                    value: false,
                     observer: "_isTimeDownloadInitializedChanged"
                 },
                 
                 isAppDownloadInitialized: {
                     type: Boolean,
-                    value: false,
                     observer: "_isAppDownloadInitializedChanged"
                 },
                 
                 isTrendDownloadInitialized: {
                     type: Boolean,
-                    value: false,
                     observer: "_isTrendDownloadInitializedChanged"
                 },
                 
