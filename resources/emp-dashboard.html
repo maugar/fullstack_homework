@@ -6,7 +6,7 @@
 <link rel="import" href="emp-timedownload.html">
 <link rel="import" href="emp-appdownload.html">
 <link rel="import" href="emp-trenddownload.html">
-
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
 
 <dom-module id="emp-dashboard">
     <template>
@@ -140,18 +140,30 @@
                 };
                 xmlhttp.open("GET", "/service/getdownloads", true);
                 xmlhttp.send();
+
+                // setup websocket to receive new data
+                var socket = io.connect('http://localhost:5000');
+                socket.on('message', (data) => {
+                    for (var i = 0; i < data.length; i++){
+                        this._addData(data[i]);
+                    }
+                });
             },
             
             _checkFillData: function(){
                 if (this.isMapInitialized && this.isCountryDownloadInitialized && this.isTimeDownloadInitialized && this.isAppDownloadInitialized && this.isTrendDownloadInitialized){
                     for (var i = 0; i < this.downloadData.length; i++){
-                        this.$$("#map").addMarker(this.downloadData[i]["longitude"], this.downloadData[i]["latitude"]);
-                        this.$$("#countrydownload").addDownload(this.downloadData[i]["country"]);
-                        this.$$("#timedownload").addDownload(this.downloadData[i]["downloaded_at"]);
-                        this.$$("#appdownload").addDownload(this.downloadData[i]["app_id"]);
-                        this.$$("#trenddownload").addDownload(this.downloadData[i]["app_id"], this.downloadData[i]["downloaded_at"]);
+                        this._addData(this.downloadData[i]);
                     }
                 }
+            },
+
+            _addData: function(data){
+                this.$$("#map").addMarker(data["longitude"], data["latitude"]);
+                this.$$("#countrydownload").addDownload(data["country"]);
+                this.$$("#timedownload").addDownload(data["downloaded_at"]);
+                this.$$("#appdownload").addDownload(data["app_id"]);
+                this.$$("#trenddownload").addDownload(data["app_id"], data["downloaded_at"]);
             },
 
             _isMapInitializedChanged: function(){

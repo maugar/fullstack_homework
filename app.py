@@ -1,8 +1,11 @@
 import sys
 import json
 from flask import Flask, request, send_from_directory, jsonify
+from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app)
 
 app_downloads = [] # stores the app download information (to be moved to a database)
 
@@ -19,6 +22,7 @@ def getIndexFile():
 def addDownloads():
     data = request.json
     app_downloads.extend(data)
+    socketio.emit('message', data)
     return "", 201
 
 # return all app downloads
@@ -71,6 +75,6 @@ python app.py add-testdata 2
         else:
             print usage
     elif len(sys.argv) == 1:
-        app.run(threaded=True,debug=True,host='0.0.0.0')
+        socketio.run(app)
     else:
         print usage
