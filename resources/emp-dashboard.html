@@ -5,6 +5,7 @@
 <link rel="import" href="emp-countrydownload.html">
 <link rel="import" href="emp-timedownload.html">
 <link rel="import" href="emp-appdownload.html">
+<link rel="import" href="emp-trenddownload.html">
 
 
 <dom-module id="emp-dashboard">
@@ -62,12 +63,14 @@
                     <paper-tab>by country</paper-tab>
                     <paper-tab>by time</paper-tab>
                     <paper-tab>by app</paper-tab>
+                    <paper-tab>trend</paper-tab>
                 </paper-tabs>
 
                 <iron-pages selected="{{tabindex}}">
                     <emp-countrydownload id="countrydownload" is-initialized="{{isCountryDownloadInitialized}}"></emp-countrydownload>
                     <emp-timedownload id="timedownload" is-initialized="{{isTimeDownloadInitialized}}"></emp-timedownload>
                     <emp-appdownload id="appdownload" is-initialized="{{isAppDownloadInitialized}}"></emp-appdownload>
+                    <emp-trenddownload id="trenddownload" is-initialized="{{isTrendDownloadInitialized}}"></emp-trenddownload>
                 </iron-pages>
             </div>
 
@@ -116,6 +119,13 @@
                     value: false,
                     observer: "_isAppDownloadInitializedChanged"
                 },
+                
+                isTrendDownloadInitialized: {
+                    type: Boolean,
+                    value: false,
+                    observer: "_isTrendDownloadInitializedChanged"
+                },
+                
             },
 
             attached: function(){
@@ -133,12 +143,13 @@
             },
             
             _checkFillData: function(){
-                if (this.isMapInitialized && this.isCountryDownloadInitialized && this.isTimeDownloadInitialized){
+                if (this.isMapInitialized && this.isCountryDownloadInitialized && this.isTimeDownloadInitialized && this.isAppDownloadInitialized && this.isTrendDownloadInitialized){
                     for (var i = 0; i < this.downloadData.length; i++){
                         this.$$("#map").addMarker(this.downloadData[i]["longitude"], this.downloadData[i]["latitude"]);
                         this.$$("#countrydownload").addDownload(this.downloadData[i]["country"]);
                         this.$$("#timedownload").addDownload(this.downloadData[i]["downloaded_at"]);
                         this.$$("#appdownload").addDownload(this.downloadData[i]["app_id"]);
+                        this.$$("#trenddownload").addDownload(this.downloadData[i]["app_id"], this.downloadData[i]["downloaded_at"]);
                     }
                 }
             },
@@ -156,6 +167,10 @@
             },
             
             _isAppDownloadInitializedChanged: function(){
+                this._checkFillData();
+            },
+            
+            _isTrendDownloadInitializedChanged: function(){
                 this._checkFillData();
             },
         });

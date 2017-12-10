@@ -1,0 +1,159 @@
+<link rel="import" href="node_modules/@polymer/polymer/polymer.html">
+<script src="node_modules/moment/moment.js"></script>
+
+<dom-module id="emp-trenddownload">
+    <template>
+        <style>
+            :host {
+            }
+
+            .header {
+                background: #BF99A4;
+                margin: 0 10px 0 10px;
+                padding: 10px;
+                border: 1px solid black;
+            }
+            
+            .footer {
+                margin: 0 10px 10px 10px;
+                padding: 10px 0 10px 0;
+                border: 1px solid black;
+            }
+
+            .plot {
+                border: 1px solid black;
+                background-color: #bc204b;
+                height: 100px;
+                margin: 0 10px 0 10px;
+            }
+            
+            .dateLeft {
+                float: left;
+            }
+            
+            .dateRight {
+                text-align: right;
+            }
+        </style>
+
+        <template is="dom-repeat" items="{{appData}}" as="data">
+            <div class="header">{{data.appid}}</div>
+            <div class="plot">
+                <template is="dom-repeat" items="{{data.heights}}" as="datapoint">
+                    <div style="float: left; background: white; width: {{data.width}}%; height: {{datapoint}}%;"></div>
+                </template>
+            </div>
+            <div class="footer">
+                <div class="dateLeft">{{data.start}}</div>
+                <div class="dateRight">{{data.end}}</div>
+            </div>
+        </template>
+
+    </template>
+
+    <script>
+
+        Polymer({
+            is: 'emp-trenddownload',
+
+            properties: {
+                // sorted app data array
+                // contains app id, download timespan, width of bars in % and an array of bar heights in %
+                appData: {
+                    type: Array,
+                    value: function(){return [];}
+                },
+
+                // unsorted data, ordered by app id
+                unsortedData: {
+                    type: Object,
+                    value: function(){return new Map();}
+                },
+
+                isInitialized: {
+                    type: Boolean,
+                    value: false,
+                    notify: true
+                }
+            },
+
+            attached: function(){
+                this.set("isInitialized", true);
+            },
+
+            addDownload: function(appid, time){
+                if (!this.unsortedData.has(appid)){
+                    this.unsortedData.set(appid, []);
+                }
+                let data = this.unsortedData.get(appid);
+                data.push(moment(time));
+                this._processData(appid);
+            },
+
+            _processData: function(appid){
+                this.debounce(appid, () => {
+                    let sortedDates = this.unsortedData.get(appid).sort(function(a, b){
+                        return 356*(a.year() - b.year()) + a.dayOfYear() - b.dayOfYear();
+                    });
+
+                    let startDate = sortedDates[0];
+                    let endDate = sortedDates[sortedDates.length - 1];
+
+                    // sum up downloads, starting from beginning
+                    let downloadsPerDay = [];
+                    let tmpDate = startDate;
+                    let totalDownloads = 0;
+                    for (let i = 0; i < sortedDates.length; i++){
+                        let dayDiff = sortedDates[i].diff(tmpDate, 'days');
+                        for (let ii = 0; ii < dayDiff; ii++){
+                            downloadsPerDay.push(totalDownloads);
+                        }
+                        totalDownloads++;
+                        tmpDate = sortedDates[i];
+                    }
+                    downloadsPerDay.push(totalDownloads);
+                    
+                    // limit bars to max 100
+                    let downloadsBar = [];
+                    let jump = Math.ceil(downloadsPerDay.length / 100);
+                    let jumpIndex = 0;
+                    let i = 0;
+                    while (jumpIndex < downloadsPerDay.length){
+                        downloadsBar[i] = downloadsPerDay[jumpIndex];
+                        jumpIndex += jump;
+                        i++;
+                    }
+
+                    // calculate percentage of total downloads starting from beginning
+                    // invert scala (15% -> 85%) since our bars are built by subtraction
+                    let downloadsPercentage = [];
+                    for (let i = 0; i < downloadsBar.length; i++){
+                        downloadsPercentage[i] = 100 - 100 * (downloadsBar[i] / totalDownloads);
+                    }
+
+                    let result = {
+                        appid: appid,
+                        start: startDate.format('DD.MM.YYYY'),
+                        end: endDate.format('DD.MM.YYYY'),
+                        width: 100 / downloadsBar.length,
+                        heights: downloadsPercentage
+                    };
+
+                    // set result on appData
+                    let index = -1;
+                    for (let i = 0; i < this.appData.length; i++){
+                        if (this.appData[i].appid == appid){
+                            index = i;
+                            break;
+                        }
+                    }
+                    if (index == -1){
+                        this.push("appData", result);
+                    } else {
+                        this.set(["appData", index], result);
+                    }
+                }, 50);
+            }
+        });
+    </script>
+</dom-module>

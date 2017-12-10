@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script src="../node_modules/webcomponents.js/webcomponents-lite.js"></script>
+        <script src="../node_modules/web-component-tester/browser.js"></script>
+        <script src="../node_modules/async/dist/async.js"></script>
+        <script src="../node_modules/@polymer/test-fixture/test-fixture-mocha.js"></script>
+        <link rel="import" href="../emp-trenddownload.html">
+        <link rel="import" href="../node_modules/@polymer/test-fixture/test-fixture.html">
+    </head>
+    <body>
+
+        <test-fixture id="fixture">
+            <template>
+                <emp-trenddownload id="myEl"></emp-trenddownload>
+            </template>
+        </test-fixture>
+
+        <script>
+            suite('<emp-trenddownload>', function() {
+                var myEl;
+                setup(function() {
+                    myEl = fixture('fixture');
+                });
+
+                test('add download', function(done) {
+                    myEl.addDownload("A", "2017-07-14 06:20:52.477395");
+                    setTimeout(function(){ 
+                        assert.isTrue(myEl.appData.length === 1);
+                        assert.isTrue(myEl.appData[0].appid === "A");
+                        assert.isTrue(myEl.appData[0].start === "14.07.2017");
+                        assert.isTrue(myEl.appData[0].end === "14.07.2017");
+                        assert.isTrue(myEl.appData[0].width === 100);
+                        assert.isTrue(myEl.appData[0].heights.length === 1);
+                        assert.isTrue(myEl.appData[0].heights[0] === 0);
+                        done();
+                    }, 120);
+                });
+                
+                test('add multiple downloads same appid', function(done) {
+                    myEl.addDownload("A", "2017-07-14 06:20:52.477395");
+                    myEl.addDownload("A", "2017-07-15 06:20:52.477395");
+                    myEl.addDownload("A", "2017-07-17 06:20:52.477395");
+                    myEl.addDownload("A", "2017-07-17 06:20:52.477395");
+                    setTimeout(function(){ 
+                        assert.isTrue(myEl.appData.length === 1);
+                        assert.isTrue(myEl.appData[0].appid === "A");
+                        assert.isTrue(myEl.appData[0].start === "14.07.2017");
+                        assert.isTrue(myEl.appData[0].end === "17.07.2017");
+                        assert.isTrue(myEl.appData[0].width === 25);
+                        assert.isTrue(myEl.appData[0].heights.length === 4);
+                        assert.isTrue(myEl.appData[0].heights[0] === 75);
+                        assert.isTrue(myEl.appData[0].heights[1] === 50);
+                        assert.isTrue(myEl.appData[0].heights[2] === 50);
+                        assert.isTrue(myEl.appData[0].heights[3] === 0);
+                        done();
+                    }, 120);
+                });
+                
+                test('add multiple downloads different appid', function(done) {
+                    myEl.addDownload("A", "2017-07-14 06:20:52.477395");
+                    myEl.addDownload("B", "2017-07-15 06:20:52.477395");
+                    myEl.addDownload("B", "2017-07-16 06:20:52.477395");
+                    setTimeout(function(){ 
+                        assert.isTrue(myEl.appData.length === 2);
+                        assert.isTrue(myEl.appData[0].appid === "A");
+                        assert.isTrue(myEl.appData[0].start === "14.07.2017");
+                        assert.isTrue(myEl.appData[0].end === "14.07.2017");
+                        assert.isTrue(myEl.appData[0].width === 100);
+                        assert.isTrue(myEl.appData[0].heights.length === 1);
+                        assert.isTrue(myEl.appData[0].heights[0] === 0);
+                        assert.isTrue(myEl.appData[1].appid === "B");
+                        assert.isTrue(myEl.appData[1].start === "15.07.2017");
+                        assert.isTrue(myEl.appData[1].end === "16.07.2017");
+                        assert.isTrue(myEl.appData[1].width === 50);
+                        assert.isTrue(myEl.appData[1].heights.length === 2);
+                        assert.isTrue(myEl.appData[1].heights[0] === 50);
+                        assert.isTrue(myEl.appData[1].heights[1] === 0);
+                        done();
+                    }, 120);
+                });
+            });
+        </script>
+    </body>
+</html>
