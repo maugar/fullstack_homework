@@ -1,0 +1,14 @@
+to run, execute:
+
+docker build -t app-downloads:latest .
+docker run -d -p 5000:5000 app-downloads
+
+in the browser, access: http://localhost:5000/
+
+
+to add testdata (e.g. with 80 datapoints), execute:
+python app.py add-testdata 80
+
+
+for running the tests you need to install yarn and the packages within resources/
+the tests can be run by accessing the following URL in the browser: localhost:5000/test/run-tests.html
